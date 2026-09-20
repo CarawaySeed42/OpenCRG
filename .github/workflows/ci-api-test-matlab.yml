@@ -1,0 +1,48 @@
+name: CI API Test Matlab
+
+on:
+    push:
+        branches: ['*']
+    pull_request:
+        branches: ['*']
+
+# cancel previous runs on the same branch / PR
+concurrency:
+    group: ${{ github.workflow }}-${{ github.ref }}
+    cancel-in-progress: true
+
+jobs:
+
+    tests:
+
+        strategy:
+            matrix:
+                # Note that some older versions (e.g R2020a, R2020b...) may not be available on all OS
+                matlab_version: [R2022b]
+                os: [ubuntu-latest, windows-2022]
+            fail-fast: false # Don't cancel all jobs if one fails
+
+        runs-on: ${{ matrix.os }}
+
+        steps:
+        # use matlab-actions/setup-matlab to setup a specific version of MATLAB
+        # https://github.com/matlab-actions/setup-matlab
+        -   name: Install MATLAB
+            uses: matlab-actions/setup-matlab@v3
+            with:
+                release: ${{ matrix.matlab_version }}
+        -   name: Checkout repository
+            uses: actions/checkout@v7
+
+        # use matlab-actions/setup-matlab to run a matlab command
+        # https://github.com/matlab-actions/setup-matlab
+        -   name: Run tests
+            uses: matlab-actions/run-command@v3
+
+            # This command will call the script run_tests_gh_ci.m that will:
+            # - set up moxunit
+            # - add MOcov to the path
+            # - run the tests
+            # - exit with the result
+            with:
+                command: run test/run_tests.m
