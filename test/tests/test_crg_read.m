@@ -17,4 +17,5 @@ function test_crg_read_no_exception
 mfiledir = fileparts(mfilename('fullpath'));
 crg_file = fullfile(fileparts(fileparts(mfiledir)), 'crg-bin', 'belgian_block.crg');
 
+error('Simulate test fail');
 crg = crg_read(crg_file); %#ok<NASGU>
